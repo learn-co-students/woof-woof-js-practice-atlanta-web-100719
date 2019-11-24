@@ -3,10 +3,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const dogBarDiv = document.querySelector('#dog-bar')
 
     function pupSpan(pup) {
-        const oldDiv = document.querySelector('#dog-info');
         const span = document.createElement('span');
         span.innerText = pup.name;
         span.addEventListener('click', (event) => {
+            const oldDiv = document.querySelector('#dog-info');
             // console.log(pupInfo(pup))
             oldDiv.parentElement.replaceChild(pupInfo(pup), oldDiv)
         })
