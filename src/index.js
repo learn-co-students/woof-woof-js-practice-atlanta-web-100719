@@ -1,6 +1,5 @@
 window.addEventListener('DOMContentLoaded', () => {
-    console.log('hello')
-    const dogBarDiv = document.querySelector('#dog-bar')
+    let dogFilter = false;
 
     function pupSpan(pup) {
         const span = document.createElement('span');
@@ -20,13 +19,11 @@ window.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(pup => {
                 const oldDiv = document.querySelector('#dog-info');
-                // console.log(pupInfo(pup))
-                oldDiv.parentElement.replaceChild(pupInfo(pup), oldDiv)
+                oldDiv.parentElement.replaceChild(pupInfoDiv(pup), oldDiv)
             })
-
     }
-    function pupInfo(pup) {
 
+    function pupInfoDiv(pup) {
         const img = document.createElement('img');
         img.src = pup.image;
         const h2 = document.createElement('h2');
@@ -46,9 +43,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ isGoodDog: !pup.isGoodDog })
             })
                 .then(res => res.json())
-                .then((data) => {
-                    console.log(data);
-                    event.target.innerText = dogText(data);
+                .then((pup) => {
+                    displayInfo(pup.id);
+                    displayBar();
                 })
 
         })
@@ -60,14 +57,47 @@ window.addEventListener('DOMContentLoaded', () => {
         return newDiv;
     }
 
+    function pupBarDiv(data) {
 
-
-    fetch('http://localhost:3000/pups')
-        .then(res => res.json())
-        .then((data) => {
-            data.forEach(pup => {
-                dogBarDiv.appendChild(pupSpan(pup))
-            })
-
+        const div = document.createElement('div');
+        div.id = 'dog-bar';
+        data.forEach(pup => {
+            div.appendChild(pupSpan(pup))
         })
+        return div
+    }
+
+    function displayBar() {
+        fetch('http://localhost:3000/pups')
+            .then(res => res.json())
+            .then((data) => {
+                if (dogFilter) {
+                    return data.filter(pup => {
+                        return pup.isGoodDog
+                    })
+                } else {
+                    return data
+                }
+            })
+            .then((data) => {
+                const dogBarDiv = document.querySelector('#dog-bar')
+                dogBarDiv.parentElement.replaceChild(pupBarDiv(data), dogBarDiv)
+            })
+    }
+
+    const button = document.querySelector('#good-dog-filter');
+    button.addEventListener('click', (event) => {
+        const onText = 'Filter good dogs: ON';
+        const offText = 'Filter good dogs: OFF';
+        if (event.target.innerText == onText) {
+            event.target.innerText = offText;
+            dogFilter = false;
+        } else {
+            event.target.innerText = onText;
+            dogFilter = true;
+        }
+        displayBar();
+    })
+
+    displayBar();
 })
